@@ -1,3 +1,4 @@
+"""
 Contiene la clase abstracta Servicio y la clase ReservaSala.
 """
 
@@ -87,3 +88,4 @@ class ReservaSala(Servicio):
             f"Precio por hora: ${self.precio_base:,.2f} | "
             f"Costo total: ${self.calcular_costo():,.2f} | "
             f"Estado: {estado}"
+        )

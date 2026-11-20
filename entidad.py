@@ -7,7 +7,9 @@ class Entidad(ABC):
     """
 
     def __init__(self, identificador):
-        self._identificador = identificador
+        if not isinstance(identificador, str) or not identificador.strip():
+            raise ValueError("El identificador no puede estar vacío.")
+        self._identificador = identificador.strip()
 
     @property
     def identificador(self):

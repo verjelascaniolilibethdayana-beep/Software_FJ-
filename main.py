@@ -162,7 +162,8 @@ def ejecutar_sistema():
             registrar_error("Prueba de cliente inválido", error)
 
         try:
-            reserva1.procesar()
+            reserva_pendiente = Reserva("R002", cliente1, sala, 1)
+            reserva_pendiente.procesar()
         except Exception as error:
             print("\n--- PRUEBA DE ERROR (PROCESAR SIN CONFIRMAR) ---")
             print("No se pudo procesar la reserva:", error)

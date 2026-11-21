@@ -47,6 +47,7 @@ def ejecutar_simulacion(mostrar=True):
         Cliente("C002", "", "correo_invalido", "123")
         fallo("Validación de cliente inválido", AssertionError("Se aceptaron datos inválidos."))
     except ValueError as error:
+        registrar_error("Validación de cliente inválido", error)
         exitoso(f"Cliente inválido detectado: {error}")
     except Exception as error:
         fallo("Error inesperado al validar cliente", error)
@@ -78,6 +79,7 @@ def ejecutar_simulacion(mostrar=True):
             AlquilerEquipo(*datos)
             fallo(descripcion, AssertionError("El sistema aceptó datos inválidos."))
         except (ValueError, TypeError) as error:
+            registrar_error(descripcion, error)
             exitoso(f"{descripcion} detectado: {error}")
         except Exception as error:
             fallo(f"Error inesperado: {descripcion}", error)
@@ -128,6 +130,7 @@ def ejecutar_simulacion(mostrar=True):
                 Reserva("R-INV", cliente1, sala1, duracion)
                 fallo(descripcion, AssertionError("Se aceptó una reserva inválida."))
             except ValueError as error:
+                registrar_error(descripcion, error)
                 exitoso(f"{descripcion} rechazada: {error}")
             except Exception as error:
                 fallo(f"Error inesperado: {descripcion}", error)
@@ -140,6 +143,7 @@ def ejecutar_simulacion(mostrar=True):
                 reserva_ocupada.confirmar()
                 fallo("Reserva sin disponibilidad", AssertionError("Se confirmó una sala ocupada."))
             except ReservaInvalidaError as error:
+                registrar_error("Reserva de servicio no disponible", error)
                 exitoso(f"Servicio no disponible detectado: {error}")
             except Exception as error:
                 fallo("Error inesperado en servicio no disponible", error)

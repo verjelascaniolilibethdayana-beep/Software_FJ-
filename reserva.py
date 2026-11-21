@@ -33,7 +33,10 @@ class Reserva:
                 "Debe proporcionar un servicio válido."
             )
 
-        exigir_entero_positivo(duracion, "La duración")
+        try:
+            exigir_entero_positivo(duracion, "La duración")
+        except ValueError as error:
+            raise ReservaInvalidaError("La duración de la reserva es inválida.") from error
 
         self.identificador = identificador.strip()
         self.cliente = cliente
@@ -90,8 +93,15 @@ class Reserva:
         self.estado = "Procesada"
         return costo
 
-    def calcular_total(self):
-        """Obtiene el costo total calculado por el servicio."""
+    def calcular_total(self, descuento=0, impuesto=0):
+        """Calcula total con tasas opcionales (entre 0 y 1).
+
+        Por defecto conserva el valor del servicio. Un descuento del 10 %
+        se expresa como 0.10, y un impuesto del 19 % como 0.19.
+        """
+        for nombre, tasa in (("descuento", descuento), ("impuesto", impuesto)):
+            if isinstance(tasa, bool) or not isinstance(tasa, (int, float)) or not 0 <= tasa <= 1:
+                raise ReservaInvalidaError(f"El {nombre} debe estar entre 0 y 1.")
         costo_base = self.servicio.calcular_costo()
 
         if (
@@ -103,7 +113,7 @@ class Reserva:
                 "No fue posible calcular el costo del servicio."
             )
 
-        return costo_base
+        return round(costo_base * (1 - descuento) * (1 + impuesto), 2)
 
     def mostrar_informacion(self):
         """Muestra los datos principales de la reserva."""

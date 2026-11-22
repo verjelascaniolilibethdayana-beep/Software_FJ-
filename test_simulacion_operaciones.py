@@ -109,25 +109,44 @@ class PruebasSoftwareFJ(unittest.TestCase):
         from tempfile import TemporaryDirectory
         from pathlib import Path
         from configuracion_logs import configurar_logging
+
         logger = logging.getLogger("software_fj")
         anteriores = logger.handlers[:]
+
         try:
-            for h in anteriores: logger.removeHandler(h)
+            # Retirar temporalmente los manejadores anteriores
+            for manejador in anteriores:
+                logger.removeHandler(manejador)
+
             with TemporaryDirectory() as temporal:
                 ruta = Path(temporal) / "registro.log"
-                configurar_logging(ruta=ruta)
-                ejecutar_simulacion(mostrar=False)
-                for h in logger.handlers: h.flush()
-                texto = ruta.read_text(encoding="utf-8")
-                self.assertIn(" | INFO | ", texto)
-                self.assertIn(" | ERROR | ", texto)
-                self.assertIn("Reserva de servicio no disponible", texto)
+
+                try:
+                    configurar_logging(ruta=ruta)
+                    ejecutar_simulacion(mostrar=False)
+
+                    # Guardar los registros antes de leer el archivo
+                    for manejador in logger.handlers:
+                        manejador.flush()
+
+                    texto = ruta.read_text(encoding="utf-8")
+
+                    self.assertIn(" | INFO | ", texto)
+                    self.assertIn(" | ERROR | ", texto)
+                    self.assertIn(
+                        "Reserva de servicio no disponible",
+                        texto
+                    )
+
+                finally:
+                    # Cerrar el archivo ANTES de eliminar la carpeta
+                    for manejador in logger.handlers[:]:
+                        logger.removeHandler(manejador)
+                        manejador.flush()
+                        manejador.close()
+
         finally:
-            for h in logger.handlers[:]:
-                logger.removeHandler(h)
-                h.close()
-            for h in anteriores: logger.addHandler(h)
+            # Restaurar los manejadores que tenía el logger
+            for manejador in anteriores:
+                logger.addHandler(manejador)
 
-
-if __name__ == "__main__":
-    unittest.main()
